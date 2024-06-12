@@ -1,24 +1,30 @@
 <template>
   <v-card class="text-center">
     <v-card-title>Pentagram</v-card-title>
-    <v-card-subtitle>Word of five symbols</v-card-subtitle>
+    <v-card-subtitle
+      >This is our final project called Pentagram. Penta for five, and gram for
+      letter</v-card-subtitle
+    >
     <v-card-text
-      >Welcome to Pentagram, This is a clone of wordle we built for an
-      assignment. You can play Wordle of the day and view the leaderboard, or
-      you can play the never ending wordle where you can play as many game as
-      you want with no stat tracking.
+      >This is a clone of a couple of the New York Time word games. We wanted to
+      make a version that lets you Practice and play as much as you want. We
+      also have a leader bard if you want to see how you compare to others.
     </v-card-text>
-    <v-card>
-      <v-card-subtitle>Navigation</v-card-subtitle>
-      <v-card-text
-        >You can enter your username by clicking on the name. The gear lets you
-        change themes. The hamburger will let you select the pages. On the game
-        pages there is a ? that shows the help page
-      </v-card-text>
-    </v-card>
-    <v-btn variant="flat" color="primary" @click="router.push('/wordleOfTheDay')"
-      >Play Wordle of the Day</v-btn>
-    <v-btn variant="flat" color="primary" @click="router.push('/neverEndingWordle')">Play never ending wordle</v-btn>
+    <div class="d-flex justify-center mt-3 mb-5">
+      <v-btn
+        variant="flat"
+        color="primary"
+        @click="router.push('/wordleOfTheDay')"
+        >Play Wordle of the Day</v-btn
+      >
+      <div class="mx-3"></div>
+      <v-btn
+        variant="flat"
+        color="primary"
+        @click="router.push('/neverEndingWordle')"
+        >Play Practice Wordle</v-btn
+      >
+    </div>
   </v-card>
 </template>
 <script setup lang="ts">
