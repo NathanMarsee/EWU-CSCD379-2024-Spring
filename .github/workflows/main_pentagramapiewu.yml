@@ -11,7 +11,7 @@ on:
       - Wordle.Api/**
   pull_request:
     branches:
-      - main
+      - FinalProject
   workflow_dispatch:
 
 jobs:
