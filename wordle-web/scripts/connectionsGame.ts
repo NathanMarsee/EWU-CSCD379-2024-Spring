@@ -53,8 +53,6 @@ export class ConnectionsGame {
     }
     if (isCorrect) {
       ++this.correctGuesses;
-      console.log("Correct Guesses " + this.correctGuesses);
-      console.log("Max Connections " + this.maxConnections);
       if (this.correctGuesses === this.maxConnections) {
         this.gameState = GameState.Won;
       }
