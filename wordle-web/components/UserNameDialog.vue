@@ -7,7 +7,7 @@
         <v-tab>Log In</v-tab>
       </v-tabs>
       <div v-if="currentPage === 0">
-        <v-card-title>Enter your Wordle Name: </v-card-title>
+        <v-card-title>Enter your game name: </v-card-title>
         <v-card-subtitle>
           Your current username is: {{ userName }}</v-card-subtitle
         >
