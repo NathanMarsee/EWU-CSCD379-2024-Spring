@@ -1,7 +1,7 @@
 <template>
   <v-card
-    :height="boxHeight"
-    :width="boxWidth"
+    :height="boxSize"
+    :width="boxSize"
     :elevation="4"
     flat
     :class="[
@@ -65,11 +65,11 @@ function onClicked() {
 
 watch([display.sm, display.xs, display.md], () => {
   if(display.xs.value){
-    boxHeight.value = 30;
+    boxSize.value = 30;
   }else if (display.sm.value) {
-    boxHeight.value = 40;
+    boxSize.value = 40;
   } else {
-    boxHeight.value = 60;
+    boxSize.value = 60;
   }
   updateWidth();
 });
