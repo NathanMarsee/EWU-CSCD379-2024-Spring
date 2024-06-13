@@ -74,6 +74,7 @@ const wordlePages = [
 const connectionsPages = [
   {name: "Home", path: "/"},
   {name: "Practice Connections", path: "/connectionsPractice"},
+  {name: "Connections" , path: "/connectionsOfTheDay"},
 ]
 onMounted(() => {
   var defaultTheme = nuxtStorage.localStorage.getData('theme');

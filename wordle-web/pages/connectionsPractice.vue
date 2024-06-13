@@ -45,7 +45,7 @@
 import { ConnectionsGame, GameState } from "~/scripts/connectionsGame";
 import { ConnectionState } from "~/scripts/connection";
 const game = reactive(new ConnectionsGame());
-game.startNewGame();
+game.startNewGame(false);
 provide("ConnectionGame", game);
 const boxColor = computed(() => {
   if (game.gameState == GameState.Playing) {
@@ -54,6 +54,6 @@ const boxColor = computed(() => {
   return game.gameState == GameState.Won ? "success" : "error";
 });
 function startNewGame() {
-  game.startNewGame();
+  game.startNewGame(false);
 }
 </script>

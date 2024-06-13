@@ -1,5 +1,7 @@
 import { ConnectionsList } from "./connectionsList";
 import { Connection, ConnectionState } from "./connection";
+import Axios from "axios";
+import { c } from "@nuxt/test-utils/dist/shared/test-utils.9059LSjm";
 
 export class ConnectionsGame {
   public maxAttempts: number;
@@ -18,7 +20,7 @@ export class ConnectionsGame {
     this.isBusy = true;
     this.gameState = GameState.Playing;
   }
-  public startNewGame() {
+  public async startNewGame(withApi: boolean) {
     this.numOfGuesses = 0;
     this.chosenConnections = [];
     this.guesses = [];
@@ -26,21 +28,10 @@ export class ConnectionsGame {
     this.gameState = GameState.Playing;
     this.correctGuessesList = [];
 
-    // Get 4 random connections
-    for (let i = 0; i < this.maxConnections; i++) {
-      const randomIndex = Math.floor(Math.random() * ConnectionsList.length);
-      this.chosenConnections.push(
-        new Connection(
-          ConnectionsList[randomIndex][0],
-          ConnectionsList[randomIndex][1]
-        )
-      );
-      console.log(
-        "Connection at index " +
-          randomIndex +
-          " " +
-          this.chosenConnections[i].description
-      );
+    if (withApi) {
+      this.chosenConnections = await this.getConnectionOfTheDayFromApi();
+    } else {
+      this.chosenConnections = await this.getRandomConnectionFromApi();
     }
   }
 
@@ -67,10 +58,10 @@ export class ConnectionsGame {
     return true;
   }
 
-  public checkIfWon(){
-    if(this.correctGuesses === this.maxConnections){
+  public checkIfWon() {
+    if (this.correctGuesses === this.maxConnections) {
       this.gameState = GameState.Won;
-    }else if(this.numOfGuesses === this.maxAttempts){
+    } else if (this.numOfGuesses === this.maxAttempts) {
       this.gameState = GameState.Lost;
     }
   }
@@ -80,7 +71,11 @@ export class ConnectionsGame {
     }
     // check if all the guess make up a connection
     for (let i = 0; i < this.chosenConnections.length; i++) {
-      if (this.chosenConnections[i].words.every((word) =>this.guesses.includes(word))) {
+      if (
+        this.chosenConnections[i].words.every((word) =>
+          this.guesses.includes(word)
+        )
+      ) {
         this.chosenConnections[i].connectionState = ConnectionState.Correct;
         this.correctGuesses++;
         this.checkIfWon();
@@ -95,12 +90,107 @@ export class ConnectionsGame {
     this.checkIfWon();
     this.guesses = [];
     return false;
-    
+  }
+
+  public parseAPIResponse(response: any): Connection[] {
+    let rawConnections = response.data as ConnectionsFromApi;
+    let connectionsFromApi: Connection[] = [];
+    this.maxConnections = rawConnections.count;
+    for (
+      let i = 0;
+      i < rawConnections.connections.length;
+      i += rawConnections.count + 1
+    ) {
+      let ConnectionsArray: string[] = [];
+      console.log("index i " + i + " " + rawConnections.connections[i]);
+      for (let j = i + 1; j < rawConnections.count + i + 1; j++) {
+        console.log("index j " + j + " " + rawConnections.connections[j]);
+        ConnectionsArray.push(rawConnections.connections[j]);
+      }
+      console.log("connections array " + ConnectionsArray);
+      let connection = new Connection(
+        rawConnections.connections[i],
+        ConnectionsArray
+      );
+      connectionsFromApi.push(connection);
+    }
+    for (let i = 0; i < connectionsFromApi.length; i++) {
+      console.log(
+        "connection parsed to return " +
+          connectionsFromApi[i].description +
+          " " +
+          connectionsFromApi[i].words
+      );
+    }
+    return connectionsFromApi;
+  }
+  public async getConnectionOfTheDayFromApi(): Promise<Connection[]> {
+    try {
+      let connectionUrl = "Connection/ConnectionsOfTheDay";
+      const response = await Axios.get(connectionUrl);
+      console.log("response from api " + response.data);
+      return this.parseAPIResponse(response);
+    } catch (error) {
+      console.error("error getting connections ofr today " + error);
+      return this.getRandomConnection();
+    }
+  }
+  public async getRandomConnectionFromApi(): Promise<Connection[]> {
+    try {
+      let connectionUrl = "Connection/RandomConnections?count=4";
+      const response = await Axios.get(connectionUrl);
+      return this.parseAPIResponse(response);
+    } catch (error) {
+      console.error("error getting random connection " + error);
+      return this.getRandomConnection();
+    }
+  }
+  public getRandomConnection(): Connection[] {
+    let randomCollection: Connection[] = [];
+    for (let i = 0; i < this.maxConnections; i++) {
+      const randomIndex = Math.floor(Math.random() * ConnectionsList.length);
+      randomCollection.push(
+        new Connection(
+          ConnectionsList[randomIndex][0],
+          ConnectionsList[randomIndex][1]
+        )
+      );
+    }
+    return randomCollection;
   }
 }
-
+interface ConnectionsFromApi {
+  count: number;
+  connections: string[];
+}
 export enum GameState {
   Playing,
   Won,
   Lost,
 }
+/* API returns
+{
+  "count": 4,
+  "connections": [
+    "U.S. cities",
+    "billings",
+    "buffalo",
+    "mobile",
+    "phoenix",
+    "what 'digs' might mean",
+    "apartment",
+    "insults",
+    "likes",
+    "shovels",
+    "remove, as body hair",
+    "laser",
+    "pluck",
+    "thread",
+    "wax",
+    "b-_ _ _",
+    "ball",
+    "movie",
+    "school",
+    "vitamin"
+  ]
+}*/
