@@ -31,7 +31,7 @@
       <v-btn
         color="primary"
         :disabled="game.gameState != GameState.Playing"
-        @click="game.checkGuess()"
+        @click="checkGuess()"
         >Submit your guess</v-btn
       >
     </div>
@@ -39,30 +39,12 @@
 </template>
 <script setup lang="ts">
 import { ConnectionsGame, GameState } from "~/scripts/connectionsGame";
-import { Connection } from "~/scripts/connection";
 const game = reactive(new ConnectionsGame());
-const boxSize = ref(100);
-const boxColor = ref("wrong");
+const isCorrect = ref(false);
 game.startNewGame();
 provide("ConnectionGame", game);
+provide("isCorrect", isCorrect);
 function checkGuess() {
-  game.checkGuess();
-}
-function onClicked() {
-  if (!game) {
-    return;
-  }
-  let added = false;
-  if (boxColor.value === "wrong") {
-    added = game.addGuess(props.word);
-    if (added) {
-      boxColor.value = "primary";
-    } else {
-      boxColor.value = "wrong";
-    }
-  } else {
-    boxColor.value = "wrong";
-    game.removeGuess(props.word);
-  }
+  isCorrect.value = game.checkGuess();
 }
 </script>
