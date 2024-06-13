@@ -15,5 +15,15 @@ public static class Seeder
 
             await db.SaveChangesAsync();
         }
+
+        if (!db.ConnectionGroups.Any())
+        {
+            foreach (var connection in ConnectionService.ConnectionList())
+            {
+                db.ConnectionGroups.Add(new ConnectionGroup() { Description = connection.Description, Items = connection.Items });
+            }
+
+            await db.SaveChangesAsync();
+        }
     }
 }
