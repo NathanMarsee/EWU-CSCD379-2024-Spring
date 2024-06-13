@@ -56,10 +56,10 @@ namespace Wordle.Api.Services
                 }
             }
 
-            ConnectionListDto allConnections = new() { Count = 4};
+            ConnectionListDto allConnections = new() { Count = 4, Connections = [] };
             foreach (ConnectionGroup connection in connectionsOfTheDay.Connections!)
             {
-                allConnections.Connections = ConnectionToWordList(connection);
+                allConnections.Connections.AddRange(ConnectionToWordList(connection));
             }
             return allConnections;
         }

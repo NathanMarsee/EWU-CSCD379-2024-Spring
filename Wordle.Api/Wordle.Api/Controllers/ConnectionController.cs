@@ -22,7 +22,7 @@ public class ConnectionController(ConnectionService connectionService) : Control
                 connections.Add(item);
             }
         }
-        return new ConnectionListDto { Count = 4, Connections = connections };
+        return new ConnectionListDto { Count = count, Connections = connections };
     }
 
     /// <summary>
