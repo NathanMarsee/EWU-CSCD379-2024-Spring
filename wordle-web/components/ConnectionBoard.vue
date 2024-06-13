@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row dense class="justify-center">
-      <v-col cols="auto" v-for="(word, k) of guess.words" :key="k">
+      <v-col  cols="auto" v-for="(word, k) of guess.words" :key="k">
         <ConnectionWordBox :word="word" />
       </v-col>
     </v-row>
@@ -11,6 +11,7 @@
 import { defineProps } from "vue";
 import { Connection } from "~/scripts/connection";
 
+const isCorrect: Ref<boolean> = inject("isCorrect") as Ref<boolean>;
 const props = defineProps<{
   guess: Connection;
 }>();

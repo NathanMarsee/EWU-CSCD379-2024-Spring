@@ -27,13 +27,15 @@ const props = withDefaults(
   }
 );
 
-const game: ConnectionsGame | undefined = inject("ConnectionGame", undefined);
+const game: ConnectionsGame =inject("ConnectionGame")as ConnectionsGame;
 const boxSize = ref(100);
 const display = useDisplay();
 const boxHeight = ref(60);
 const boxWidth = ref(80);
 const boxColor = ref("wrong");
+const isCorrect: Ref<boolean> = inject("isCorrect") as Ref<boolean>;
 updateWidth();
+
 
 function onClicked() {
   if (!game) {
@@ -53,13 +55,14 @@ function onClicked() {
   }
 }
 
+
 watch([display.sm, display.xs, display.md], () => {
   if (display.xs.value) {
-    boxSize.value = 60;
+    boxSize.value = 100;
   } else if (display.sm.value) {
-    boxSize.value = 60;
+    boxSize.value = 100;
   } else {
-    boxSize.value = 60;
+    boxSize.value = 100;
   }
   updateWidth();
 });

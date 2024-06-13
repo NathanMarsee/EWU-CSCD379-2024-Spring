@@ -14,29 +14,29 @@ test("connections-game", () => {
 test("check-guess", () => {
   const game = new ConnectionsGame();
   game.chosenConnections.push(new Connection("car", ["engine", "wheels", "gas", "brakes" ]));
-  const guess = ["engine", "wheels", "gas", "brakes" ];
-  expect(game.checkGuess(guess)).toBe(true);
+  game.guesses = ["engine", "wheels", "gas", "brakes" ];
+  expect(game.checkGuess()).toBe(true);
 });
 //test if the guess is correct if the order is different
 test("check-guessCorrectOnDiffOrder", () => {
   const game = new ConnectionsGame();
   game.chosenConnections.push(new Connection("car", ["engine", "wheels", "gas", "brakes" ]));
-  const guess = ["wheels", "engine", "brakes", "gas" ];
-  expect(game.checkGuess(guess)).toBe(true);
+  game.guesses = ["wheels", "engine", "brakes", "gas" ];
+  expect(game.checkGuess()).toBe(true);
 });
 //test if the guess is incorrect  
 test("check-guessIncorrect", () => {
   const game = new ConnectionsGame();
   game.chosenConnections.push(new Connection("car", ["engine", "wheels", "gas", "brakes" ]));
-  const guess = ["engine", "wheels", "door", "brakes", "tires" ];
-  expect(game.checkGuess(guess)).toBe(false);
+  game.guesses = ["engine", "wheels", "door", "brakes"];
+  expect(game.checkGuess()).toBe(false);
 });
 //test if the game is won
 test("check-GameIsWon", () => {
   const game = new ConnectionsGame(1,1);
   console.log(`Test initialized with maxConnections: ${game.maxConnections}`);
   game.chosenConnections.push(new Connection("car", ["engine", "wheels", "gas", "brakes" ]));
-  const guess = ["engine", "wheels", "gas", "brakes" ];
-  game.checkGuess(guess);
+  game.guesses = ["engine", "wheels", "gas", "brakes" ];
+  game.checkGuess();
   expect(game.gameState).toBe(GameState.Won);
 });
