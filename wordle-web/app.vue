@@ -75,6 +75,7 @@ const connectionsPages = [
   {name: "Home", path: "/"},
   {name: "Practice Connections", path: "/connectionsPractice"},
   {name: "Connections" , path: "/connectionsOfTheDay"},
+  {name: "How To Play", path: "/connectionsHowToPlay"},
 ]
 onMounted(() => {
   var defaultTheme = nuxtStorage.localStorage.getData('theme');
