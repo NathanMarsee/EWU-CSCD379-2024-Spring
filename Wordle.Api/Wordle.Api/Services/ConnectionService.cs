@@ -17,14 +17,11 @@ namespace Wordle.Api.Services
         }
         public async Task<List<ConnectionGroup>> GetRandomConnections(int num)
         {
-            var numberOfConnections = await Db.ConnectionGroups.CountAsync();
-
-            Random random = new Random();
-
-            // Asynchronously execute the query and return the results
-            return await Db.ConnectionGroups.OrderBy(x => random.Next())
-                                            .Take(num)
-                                            .ToListAsync();
+            // Use Guid.NewGuid() to order the records in a random way
+            return await Db.ConnectionGroups
+                           .OrderBy(x => Guid.NewGuid())
+                           .Take(num)
+                           .ToListAsync();
         }
 
 
