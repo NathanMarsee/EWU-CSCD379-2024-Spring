@@ -43,7 +43,6 @@
         <NuxtPage />
       </v-main>
     </v-app>
-    <NuxtPage />
   </NuxtLayout>
 </template>
 
@@ -68,12 +67,13 @@ const wordlePages = [
   { name: "Leaderboard", path: "/leaderboard" },
   { name: "Word Stats", path: "/wordStats" },
   { name: "Word List", path: "/wordList"},
-  { name: "How To Play", path: "/helpPage"},
+  { name: "How To Play", path: "/wordleHowToPlay"},
   { name: "About", path: "/about" }
 ];
 
 const connectionsPages = [
   {name: "Home", path: "/"},
+  {name: "Practice Connections", path: "/connectionsPractice"},
 ]
 onMounted(() => {
   var defaultTheme = nuxtStorage.localStorage.getData('theme');

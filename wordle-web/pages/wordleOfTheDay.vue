@@ -3,9 +3,13 @@
 
   <HelpDialog v-model="showHelpDialog" />
   <v-container>
-    <v-btn icon="mdi-help-box" @click="showHelpDialog = true" />
     <v-progress-linear v-if="game.isBusy" color="primary" indeterminate />
     <v-card v-else class="text-center">
+      <v-btn
+        icon="mdi-help-box"
+        class="d-flex justify left"
+        @click="showHelpDialog = true"
+      />
       <v-alert
         v-if="game.gameState != GameState.Playing"
         :color="game.gameState == GameState.Won ? 'success' : 'error'"
@@ -46,12 +50,16 @@
             <i class="text-caption"> Average Guesses </i>
           </v-col>
         </v-row>
-        <v-btn variant="outlined" @click="game.startNewGameAPI(), startTime = new Date().getTime();">
+        <v-btn
+          variant="outlined"
+          @click="game.startNewGameAPI(), (startTime = new Date().getTime())"
+        >
           <v-icon size="large" class="mr-2"> mdi-restart </v-icon> Restart Game
         </v-btn>
       </v-alert>
       <v-card-title v-else>Wordle</v-card-title>
-
+    <v-card-subtitle>Play the wordle of the day</v-card-subtitle>
+    <div class="my-5"></div>
       <GameBoardGuess
         v-for="(guess, i) of game.guesses"
         :key="i"
@@ -61,22 +69,24 @@
       <div class="my-10">
         <Keyboard />
       </div>
-
-      <div class="my-5">
+      <div class="d-flex justify-center mt-3 mb-5">
         <ValidWord />
+        <div class="mx-3"></div>
+        <v-btn
+          @click="game.submitGuess(true, userName, calcSecond())"
+          class="mb-5"
+          color="primary"
+          >Guess!</v-btn
+        >
+        <div class="mx-3"></div>
+        <v-btn
+          class="mb-5 ml-5"
+          color="primary"
+          variant="flat"
+          @click="router.push('/leaderboard')"
+          >Leaderboard</v-btn
+        >
       </div>
-
-      <v-btn @click="game.submitGuess(true, userName, calcSecond())" class="mb-5" color="primary"
-        >Guess!</v-btn
-      >
-
-      <v-btn
-        class="mb-5 ml-5"
-        color="primary"
-        variant="flat"
-        @click="router.push('/leaderboard')"
-        >Leaderboard</v-btn
-      >
     </v-card>
   </v-container>
 </template>
@@ -120,16 +130,27 @@ function calcAttempts() {
   return attempts;
 }
 function postScore(playerNameIn: string, attemptsIn: number, timeIn: number) {
-  console.log("data for Player/UpdateScore: " + playerNameIn + " " + attemptsIn + " " + timeIn);
+  console.log(
+    "data for Player/UpdateScore: " +
+      playerNameIn +
+      " " +
+      attemptsIn +
+      " " +
+      timeIn
+  );
   let postScoreUrl = "Player/UpdateScore";
   Axios.post(postScoreUrl, {
     playerName: playerNameIn,
     attempts: attemptsIn,
     time: timeIn,
   }).then((response) => {
-    console.log("response from API Player/UpdateScore " + response.data + " " + response.status);
+    console.log(
+      "response from API Player/UpdateScore " +
+        response.data +
+        " " +
+        response.status
+    );
   });
-  
 }
 function calcSecond() {
   var endTime = new Date().getTime();
@@ -151,7 +172,7 @@ watch(
           () => showUserNameDialog.value,
           (value) => {
             if (value == false) {
-              if(userName.value ===""){
+              if (userName.value === "") {
                 userName.value = "guest";
               }
               postScore(userName.value, calcAttempts(), calcSecond());
