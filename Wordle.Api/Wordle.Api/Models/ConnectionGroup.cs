@@ -3,6 +3,7 @@
 namespace Wordle.Api.Models;
 public class ConnectionGroup
 {
+    [Key]
     public int WordId { get; set; }
 
     [Required]

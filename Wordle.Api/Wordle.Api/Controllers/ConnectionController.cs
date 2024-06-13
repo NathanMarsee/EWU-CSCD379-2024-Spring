@@ -7,13 +7,22 @@ using Wordle.Api.Services;
 namespace Wordle.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class ConnectionController(WordOfTheDayService wordOfTheDayService, WordEditService wordEditService) : ControllerBase
+public class ConnectionController(ConnectionService connectionService) : ControllerBase
 {
-    [HttpGet("RandomWord")]
-    public async Task<string> GetRandomWord()
+    [HttpGet("RandomConnections")]
+    public async Task<ConnectionListDto> GetRandomConnections(int count)
     {
-        var randomWord = await wordOfTheDayService.GetRandomWord();
-        return randomWord.Text;
+        var randomConnections = await connectionService.GetRandomConnections(count);
+        List<string> connections = [];
+        foreach(var connection in randomConnections) 
+        {
+            connections.Add(connection.Description);
+            foreach(string item in connection.Items)
+            {
+                connections.Add(item);
+            }
+        }
+        return new ConnectionListDto { Count = 4, Connections = connections };
     }
 
     /// <summary>
@@ -21,37 +30,16 @@ public class ConnectionController(WordOfTheDayService wordOfTheDayService, WordE
     /// </summary>
     /// <param name="offsetInHours">Timezone offset in hours. Default to PST</param>
     /// <returns></returns>
-    [HttpGet("WordOfTheDay")]
-    public async Task<string> GetWordOfDay(double offsetInHours = -7.0)
+    [HttpGet("ConnectionsOfTheDay")]
+    public async Task<ConnectionListDto> GetConnectionsOfTheDay(double offsetInHours = -7.0)
     {
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(offsetInHours));
-        return await wordOfTheDayService.GetWordOfTheDay(today);
+        return await connectionService.GetConnectionsOfTheDay(today);
     }
 
-    [HttpGet("WordsList/")]
-    public async Task<WordListDto> GetWordList(string query = "", int page = 1, int pageSize = 10)
+    [HttpGet("ConnectionsList/")]
+    public async Task<ConnectionListDto> GetConnectionList(string query = "", int page = 1, int pageSize = 10)
     {
-        return await wordOfTheDayService.GetWordList(query, page, pageSize);
-    }
-
-    [HttpPost("AddWord")]
-    [Authorize(Policy = Policies.AddOrRemoveWords)]
-    public async Task AddWord(WordDto word)
-    {
-        await wordEditService.AddWord(word);
-    }
-
-    [HttpDelete("RemoveWord")]
-    [Authorize(Policy = Policies.AddOrRemoveWords)]
-    public async Task RemoveWord(string word)
-    {
-        await wordEditService.RemoveWord(word);
-    }
-
-    [HttpPost("UpdateWord")]
-    [Authorize]
-    public async Task UpdateWord(WordDto word)
-    {
-        await wordEditService.UpdateWord(word);
+        return await connectionService.GetConnectionList(query, page, pageSize);
     }
 }

@@ -15,18 +15,20 @@ namespace Wordle.Api.Services
         {
             Db = db;
         }
-
-        public List<ConnectionGroup> GetRandomConnections()
+        public async Task<List<ConnectionGroup>> GetRandomConnections(int num)
         {
-            var numberOfConnections = Db.ConnectionGroups.CountAsync();
+            var numberOfConnections = await Db.ConnectionGroups.CountAsync();
 
-            Random random = new();
+            Random random = new Random();
 
-            //return await Db.ConnectionGroups.Skip(randomIndex).FirstAsync();
-            return Db.ConnectionGroups.OrderBy(x => random.Next()).Take(4).ToList();
+            // Asynchronously execute the query and return the results
+            return await Db.ConnectionGroups.OrderBy(x => random.Next())
+                                            .Take(num)
+                                            .ToListAsync();
         }
 
-        public async Task<ConnectionsOfTheDay> GetConnectionsOfTheDay(DateOnly date)
+
+        public async Task<ConnectionListDto> GetConnectionsOfTheDay(DateOnly date)
         {
             ConnectionsOfTheDay? connectionsOfTheDay = await Db.ConnectionsOfTheDays
                 .Include(connectionsOfTheDay => connectionsOfTheDay.Connections)
@@ -41,9 +43,10 @@ namespace Wordle.Api.Services
                         .FirstOrDefault(connectionsOfTheDay => connectionsOfTheDay.Date == date);
                     if (connectionsOfTheDay is null)
                     {
-                        /*var randomConnectionsTask = GetRandomConnections();
-                        randomConnectionsTask.Wait();*/
-                        var randomConnections = GetRandomConnections();
+                        var randomConnectionsTask = GetRandomConnections(4);
+                        randomConnectionsTask.Wait();
+                        List<ConnectionGroup> randomConnections =randomConnectionsTask.Result;
+                        //var randomConnections = GetRandomConnections(4);
                         connectionsOfTheDay = new()
                         {
                             Connections = randomConnections,
@@ -56,7 +59,12 @@ namespace Wordle.Api.Services
                 }
             }
 
-            return connectionsOfTheDay!;
+            ConnectionListDto allConnections = new() { Count = 4};
+            foreach (ConnectionGroup connection in connectionsOfTheDay.Connections!)
+            {
+                allConnections.Connections = ConnectionToWordList(connection);
+            }
+            return allConnections;
         }
 
         public async Task<ConnectionListDto> GetConnectionList(string query, int page, int pageSize)
@@ -74,10 +82,23 @@ namespace Wordle.Api.Services
                 .Take(pageSize).ToListAsync();
 
 
-            return new ConnectionListDto() { Count = count, Connections = ToWordList(results) };
+            return new ConnectionListDto() { Count = count, Connections = ConnectionDtosToWordList(results) };
         }
 
-        public List<string> ToWordList(List<ConnectionDto> connectionDtos)
+        public List<string> ConnectionToWordList(ConnectionGroup connection)
+        {
+            var list = new List<string>
+            {
+                connection.Description
+            };
+            foreach (var item in connection.Items)
+            {
+                list.Add(item);
+            }
+            return list;
+        }
+
+        public List<string> ConnectionDtosToWordList(List<ConnectionDto> connectionDtos)
         {
             var list = new List<string>();
             foreach (var connectionDto in connectionDtos)
