@@ -3,8 +3,9 @@
         <v-card>
             <v-card-title>Settings</v-card-title>
             <v-card-subtitle>Change the theme of the app or toggle light or dark mode</v-card-subtitle>
-
+            <div class="d-flex justify-center my-1"></div> 
             <v-btn @click="toggleTheme" color="primary">Toggle Theme</v-btn>
+            <div class="d-flex justify-center my-1"></div> 
             <v-menu color="primary">
                 <template v-slot:activator="{ props }">
                     <v-btn color="primary" class="justify-center" v-bind="props">
@@ -17,6 +18,7 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+            <div class="d-flex justify-center my-1"></div> 
         </v-card>
     </v-dialog>
 </template>
