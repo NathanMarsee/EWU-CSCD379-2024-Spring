@@ -12,8 +12,9 @@
       </h3>
       <v-card-text v-for="(connection, k) of game.chosenConnections">
         The connection was: <strong>{{ connection.description }}</strong>
+        The words were:
         <div v-for="(word, k) of connection.words">
-          The words were: <strong>{{ word }}</strong>
+           <strong>{{ word.word }}</strong>
         </div>
       </v-card-text>
     </v-alert>
@@ -23,9 +24,7 @@
         v-for="(connection, k) of game.chosenConnections"
         :key="k"
         :guess="connection"
-        :state="connection.connectionState"
       />
-      <div class="d-flex justify-center my-5">your selected guesses are {{ game.guesses }}</div>
       <div class="d-flex justify-center my-5">
         <v-btn
           color="primary"

@@ -1,7 +1,6 @@
 import { ConnectionsList } from "./connectionsList";
-import { Connection, ConnectionState } from "./connection";
+import { Connection, ConnectionState, ConnectionsWord } from "./connection";
 import Axios from "axios";
-import { c } from "@nuxt/test-utils/dist/shared/test-utils.9059LSjm";
 
 export class ConnectionsGame {
   public maxAttempts: number;
@@ -33,6 +32,15 @@ export class ConnectionsGame {
     } else {
       this.chosenConnections = await this.getRandomConnectionFromApi();
     }
+  }
+  public startNewGameOffline() {
+    this.numOfGuesses = 0;
+    this.chosenConnections = [];
+    this.guesses = [];
+    this.correctGuesses = 0;
+    this.gameState = GameState.Playing;
+    this.correctGuessesList = [];
+    this.chosenConnections = this.getRandomConnection();
   }
 
   public addGuess(word: string): boolean {
@@ -73,16 +81,27 @@ export class ConnectionsGame {
     for (let i = 0; i < this.chosenConnections.length; i++) {
       if (
         this.chosenConnections[i].words.every((word) =>
-          this.guesses.includes(word)
+          this.guesses.includes(word.word)
         )
       ) {
-        this.chosenConnections[i].connectionState = ConnectionState.Correct;
+        for (let j = 0; j < this.chosenConnections[i].words.length; j++) {
+          this.chosenConnections[i].words[j].state = ConnectionState.Correct;
+        }
         this.correctGuesses++;
         this.checkIfWon();
         this.guesses = [];
 
         console.log("the guess is correct");
         return true;
+      }
+    }
+    for (let i = 0; i < this.chosenConnections.length; i++) {
+      for (let j = 0; j < this.chosenConnections[i].words.length; j++) {
+        for (let k = 0; k < this.guesses.length; k++) {
+          if (this.chosenConnections[i].words[j].word === this.guesses[k]) {
+            this.chosenConnections[i].words[j].state = ConnectionState.Wrong;
+          }
+        }
       }
     }
     console.log("the guess is wrong");
@@ -101,11 +120,13 @@ export class ConnectionsGame {
       i < rawConnections.connections.length;
       i += rawConnections.count + 1
     ) {
-      let ConnectionsArray: string[] = [];
+      let ConnectionsArray: ConnectionsWord[] = [];
       console.log("index i " + i + " " + rawConnections.connections[i]);
       for (let j = i + 1; j < rawConnections.count + i + 1; j++) {
         console.log("index j " + j + " " + rawConnections.connections[j]);
-        ConnectionsArray.push(rawConnections.connections[j]);
+        ConnectionsArray.push(
+          new ConnectionsWord(rawConnections.connections[j])
+        );
       }
       console.log("connections array " + ConnectionsArray);
       let connection = new Connection(
@@ -147,13 +168,14 @@ export class ConnectionsGame {
   }
   public getRandomConnection(): Connection[] {
     let randomCollection: Connection[] = [];
+    let randomWrd: ConnectionsWord[] = [];
     for (let i = 0; i < this.maxConnections; i++) {
       const randomIndex = Math.floor(Math.random() * ConnectionsList.length);
+      for (let j = 0; j < ConnectionsList[randomIndex][1].length; j++) {
+        randomWrd.push(new ConnectionsWord(ConnectionsList[randomIndex][1][j]));
+      }
       randomCollection.push(
-        new Connection(
-          ConnectionsList[randomIndex][0],
-          ConnectionsList[randomIndex][1]
-        )
+        new Connection(ConnectionsList[randomIndex][0], randomWrd)
       );
     }
     return randomCollection;

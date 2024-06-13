@@ -5,21 +5,20 @@
     :elevation="4"
     flat
     :boxColor="boxColor"
-    :class="[correctState(state), 'align-center d-flex justify-center']"
+    :class="[correctState(word.state), 'align-center d-flex justify-center']"
     @click="onClicked()"
   >
-    {{ word }}
+    {{ word.word }}
   </v-card>
 </template>
 <script setup lang="ts">
 import { defineProps } from "vue";
 import { useDisplay } from "vuetify";
 import { ConnectionsGame } from "~/scripts/connectionsGame";
-import { ConnectionState } from "~/scripts/connection";
+import { ConnectionState, ConnectionsWord } from "~/scripts/connection";
 const props = withDefaults(
   defineProps<{
-    word: string;
-    state: ConnectionState;
+    word: ConnectionsWord;
     clickable?: boolean;
     widthPercentOfHeight?: string;
   }>(),
@@ -42,24 +41,25 @@ function correctState(connectionState: ConnectionState) {
       return "correct-letter";
     case ConnectionState.Wrong:
       return "wrong-letter";
+    case ConnectionState.Clicked:
+      return "clicked-letter";
     default:
       return "unknown-letter";
   }
 }
-
 function onClicked() {
   if (!game) {
     return;
   }
   let added = false;
-  if (boxColor.value !== "primary") {
-    added = game.addGuess(props.word);
+  if (props.word.state === ConnectionState.Unknown || props.word.state === ConnectionState.Wrong) {
+    added = game.addGuess(props.word.word);
     if (added) {
-      boxColor.value = "primary";
+      props.word.state = ConnectionState.Clicked;
     }
-  } else {
-    game.removeGuess(props.word);
-    boxColor.value = "wrong";
+  } else if (props.word.state === ConnectionState.Clicked) {
+    game.removeGuess(props.word.word);
+    props.word.state = ConnectionState.Unknown;
   }
 }
 
@@ -108,6 +108,13 @@ function updateWidth() {
     to bottom,
     rgba(var(--v-theme-unknown), 0.6),
     rgba(var(--v-theme-unknown), 0.9)
+  );
+}
+.clicked-letter {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--v-theme-primary), 0.6),
+    rgba(var(--v-theme-primary), 0.9)
   );
 }
 </style>

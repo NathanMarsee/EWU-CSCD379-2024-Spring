@@ -2,7 +2,7 @@
   <div>
     <v-row dense class="justify-center">
       <v-col  cols="auto" v-for="(word, k) of guess.words" :key="k">
-        <ConnectionWordBox :word="word" :state="props.state" />
+        <ConnectionWordBox :word="word" />
       </v-col>
     </v-row>
   </div>
@@ -14,6 +14,5 @@ import { ConnectionState } from "~/scripts/connection";
 
 const props = defineProps<{
   guess: Connection;
-  state: ConnectionState;
 }>();
 </script>
