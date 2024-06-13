@@ -16,7 +16,7 @@
         The words were: <strong>{{ word }}</strong>
       </div>
     </v-card-text>
-    <v-btn variant="outlined" @click="game.startNewGame()">
+    <v-btn variant="outlined" @click="startNewGame()">
       <v-icon size="large" class="mr-2"> mdi-restart </v-icon> Restart Game
     </v-btn>
   </v-alert>
@@ -26,25 +26,34 @@
       v-for="(connection, k) of game.chosenConnections"
       :key="k"
       :guess="connection"
+      :state="connection.connectionState"
     />
+    <div class="d-flex justify-center my-5">your selected guesses are {{ game.guesses }}</div>
     <div class="d-flex justify-center my-5">
       <v-btn
         color="primary"
         :disabled="game.gameState != GameState.Playing"
-        @click="checkGuess()"
+        @click="game.checkGuess()"
         >Submit your guess</v-btn
       >
     </div>
+    
+    <div class="d-flex justify-center my-5">Number of guesses left {{   game.maxAttempts - game.numOfGuesses}}</div>
   </v-card>
 </template>
 <script setup lang="ts">
 import { ConnectionsGame, GameState } from "~/scripts/connectionsGame";
+import { ConnectionState } from "~/scripts/connection";
 const game = reactive(new ConnectionsGame());
-const isCorrect = ref(false);
 game.startNewGame();
 provide("ConnectionGame", game);
-provide("isCorrect", isCorrect);
-function checkGuess() {
-  isCorrect.value = game.checkGuess();
+const boxColor = computed(() => {
+  if (game.gameState == GameState.Playing) {
+    return "wrong";
+  }
+  return game.gameState == GameState.Won ? "success" : "error";
+});
+function startNewGame() {
+  game.startNewGame();
 }
 </script>

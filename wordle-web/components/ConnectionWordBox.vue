@@ -4,8 +4,8 @@
     :width="boxSize"
     :elevation="4"
     flat
-    :color="boxColor"
-    :class="['align-center d-flex justify-center']"
+    :boxColor="boxColor"
+    :class="[correctState(state), 'align-center d-flex justify-center']"
     @click="onClicked()"
   >
     {{ word }}
@@ -15,10 +15,11 @@
 import { defineProps } from "vue";
 import { useDisplay } from "vuetify";
 import { ConnectionsGame } from "~/scripts/connectionsGame";
-
+import { ConnectionState } from "~/scripts/connection";
 const props = withDefaults(
   defineProps<{
     word: string;
+    state: ConnectionState;
     clickable?: boolean;
     widthPercentOfHeight?: string;
   }>(),
@@ -27,34 +28,40 @@ const props = withDefaults(
   }
 );
 
-const game: ConnectionsGame =inject("ConnectionGame")as ConnectionsGame;
+const game: ConnectionsGame = inject("ConnectionGame") as ConnectionsGame;
 const boxSize = ref(100);
 const display = useDisplay();
 const boxHeight = ref(60);
 const boxWidth = ref(80);
 const boxColor = ref("wrong");
-const isCorrect: Ref<boolean> = inject("isCorrect") as Ref<boolean>;
 updateWidth();
 
+function correctState(connectionState: ConnectionState) {
+  switch (connectionState) {
+    case ConnectionState.Correct:
+      return "correct-letter";
+    case ConnectionState.Wrong:
+      return "wrong-letter";
+    default:
+      return "unknown-letter";
+  }
+}
 
 function onClicked() {
   if (!game) {
     return;
   }
   let added = false;
-  if (boxColor.value === "wrong") {
+  if (boxColor.value !== "primary") {
     added = game.addGuess(props.word);
     if (added) {
       boxColor.value = "primary";
-    } else {
-      boxColor.value = "wrong";
     }
   } else {
-    boxColor.value = "wrong";
     game.removeGuess(props.word);
+    boxColor.value = "wrong";
   }
 }
-
 
 watch([display.sm, display.xs, display.md], () => {
   if (display.xs.value) {
@@ -77,3 +84,30 @@ function updateWidth() {
   }
 }
 </script>
+<style scoped>
+.no-pointer {
+  pointer-events: none;
+}
+.correct-letter {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--v-theme-correct), 0.6),
+    rgba(var(--v-theme-correct), 0.9)
+  );
+}
+.wrong-letter {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--v-theme-wrong), 0.6),
+    rgba(var(--v-theme-wrong), 0.9)
+  );
+}
+
+.unknown-letter {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--v-theme-unknown), 0.6),
+    rgba(var(--v-theme-unknown), 0.9)
+  );
+}
+</style>

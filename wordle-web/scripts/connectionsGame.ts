@@ -1,5 +1,5 @@
 import { ConnectionsList } from "./connectionsList";
-import { Connection } from "./connection";
+import { Connection, ConnectionState } from "./connection";
 
 export class ConnectionsGame {
   public maxAttempts: number;
@@ -10,6 +10,7 @@ export class ConnectionsGame {
   public correctGuesses: number = 0;
   public numOfGuesses: number = 0;
   public guesses: string[] = [];
+  public correctGuessesList: string[] = [];
 
   constructor(maxAttempts: number = 5, maxConnections: number = 4) {
     this.maxAttempts = maxAttempts;
@@ -23,6 +24,7 @@ export class ConnectionsGame {
     this.guesses = [];
     this.correctGuesses = 0;
     this.gameState = GameState.Playing;
+    this.correctGuessesList = [];
 
     // Get 4 random connections
     for (let i = 0; i < this.maxConnections; i++) {
@@ -79,13 +81,19 @@ export class ConnectionsGame {
     // check if all the guess make up a connection
     for (let i = 0; i < this.chosenConnections.length; i++) {
       if (this.chosenConnections[i].words.every((word) =>this.guesses.includes(word))) {
+        this.chosenConnections[i].connectionState = ConnectionState.Correct;
         this.correctGuesses++;
         this.checkIfWon();
+        this.guesses = [];
+
+        console.log("the guess is correct");
         return true;
       }
     }
+    console.log("the guess is wrong");
     this.numOfGuesses++;
     this.checkIfWon();
+    this.guesses = [];
     return false;
     
   }
