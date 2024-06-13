@@ -12,6 +12,7 @@ export class ConnectionsGame {
   public numOfGuesses: number = 0;
   public guesses: string[] = [];
   public correctGuessesList: string[] = [];
+  public numOfWords: number = 4;
 
   constructor(maxAttempts: number = 5, maxConnections: number = 4) {
     this.maxAttempts = maxAttempts;
@@ -19,19 +20,27 @@ export class ConnectionsGame {
     this.isBusy = true;
     this.gameState = GameState.Playing;
   }
-  public async startNewGame(withApi: boolean) {
+  public async startNewGame(
+    withApi: boolean,
+    maxAttempts: number = 5,
+    maxConnections: number = 4
+  ) {
+    this.isBusy = true;
     this.numOfGuesses = 0;
     this.chosenConnections = [];
     this.guesses = [];
     this.correctGuesses = 0;
     this.gameState = GameState.Playing;
     this.correctGuessesList = [];
+    this.maxAttempts = maxAttempts;
+    this.maxConnections = maxConnections;
 
     if (withApi) {
       this.chosenConnections = await this.getConnectionOfTheDayFromApi();
     } else {
       this.chosenConnections = await this.getRandomConnectionFromApi();
     }
+    this.isBusy = false;
   }
   public startNewGameOffline() {
     this.numOfGuesses = 0;
@@ -74,6 +83,7 @@ export class ConnectionsGame {
     }
   }
   public checkGuess(): boolean {
+    this.isBusy = true;
     if (this.guesses.length !== this.chosenConnections[0].words.length) {
       return false;
     }
@@ -92,6 +102,7 @@ export class ConnectionsGame {
         this.guesses = [];
 
         console.log("the guess is correct");
+        this.isBusy = false;
         return true;
       }
     }
@@ -108,6 +119,7 @@ export class ConnectionsGame {
     this.numOfGuesses++;
     this.checkIfWon();
     this.guesses = [];
+    this.isBusy = false;
     return false;
   }
 
@@ -118,17 +130,16 @@ export class ConnectionsGame {
     for (
       let i = 0;
       i < rawConnections.connections.length;
-      i += rawConnections.count + 1
+      i += this.numOfWords + 1
     ) {
       let ConnectionsArray: ConnectionsWord[] = [];
-      console.log("index i " + i + " " + rawConnections.connections[i]);
-      for (let j = i + 1; j < rawConnections.count + i + 1; j++) {
-        console.log("index j " + j + " " + rawConnections.connections[j]);
+      console.log("index i connections " + i + " " + rawConnections.connections[i]);
+      for (let j = i + 1; j < this.numOfWords + i + 1; j++) {
+        console.log("index j words " + j + " " + rawConnections.connections[j]);
         ConnectionsArray.push(
           new ConnectionsWord(rawConnections.connections[j])
         );
       }
-      console.log("connections array " + ConnectionsArray);
       let connection = new Connection(
         rawConnections.connections[i],
         ConnectionsArray
@@ -158,7 +169,8 @@ export class ConnectionsGame {
   }
   public async getRandomConnectionFromApi(): Promise<Connection[]> {
     try {
-      let connectionUrl = "Connection/RandomConnections?count=4";
+      let connectionUrl =
+        "Connection/RandomConnections?count=" + this.maxConnections;
       const response = await Axios.get(connectionUrl);
       return this.parseAPIResponse(response);
     } catch (error) {

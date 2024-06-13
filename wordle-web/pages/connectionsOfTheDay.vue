@@ -1,4 +1,5 @@
 <template>
+  <v-progress-linear v-if="game.isBusy" color="primary" indeterminate />
     <v-alert
       v-if="game.gameState != GameState.Playing"
       :color="game.gameState == GameState.Won ? 'success' : 'error'"
